@@ -41,6 +41,7 @@ pub(crate) struct MyOptions {
 #[derive(Debug, Subcommand)]
 pub(crate) enum Command {
     /// Inspect Zcash-related data
+    #[cfg(feature = "inspect")]
     Inspect(commands::inspect::Command),
 
     /// Manipulate a local wallet backed by `zcash_client_sqlite`
@@ -50,9 +51,11 @@ pub(crate) enum Command {
     Zip48(commands::Zip48),
 
     /// Send funds using PCZTs
+    #[cfg(feature = "pczt")]
     Pczt(commands::Pczt),
 
     /// Migrate wallet funds between value pools (Orchard -> Ironwood)
+    #[cfg(feature = "migration")]
     Migration(commands::Migration),
 
     /// Emulate a Keystone device
@@ -139,6 +142,7 @@ fn main() -> Result<(), anyhow::Error> {
         };
 
         match cmd {
+            #[cfg(feature = "inspect")]
             Command::Inspect(command) => command.run().await,
             Command::Wallet(commands::Wallet {
                 wallet_dir,
@@ -199,6 +203,7 @@ fn main() -> Result<(), anyhow::Error> {
                 commands::zip48::Command::VerifyAccount(command) => command.run(wallet_dir),
                 commands::zip48::Command::DeriveAddress(command) => command.run(wallet_dir),
             },
+            #[cfg(feature = "pczt")]
             Command::Pczt(commands::Pczt {
                 wallet_dir,
                 command,
@@ -266,6 +271,7 @@ fn main() -> Result<(), anyhow::Error> {
                         .await
                 }
             },
+            #[cfg(feature = "migration")]
             Command::Migration(commands::Migration {
                 wallet_dir,
                 command,

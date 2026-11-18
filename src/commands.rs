@@ -5,11 +5,17 @@ use zcash_client_backend::data_api::WalletRead;
 use zcash_client_sqlite::AccountUuid;
 
 pub(crate) mod create_multisig_address;
-pub(crate) mod inspect;
-pub(crate) mod migration;
-pub(crate) mod pczt;
 pub(crate) mod wallet;
 pub(crate) mod zip48;
+
+#[cfg(feature = "inspect")]
+pub(crate) mod inspect;
+
+#[cfg(feature = "migration")]
+pub(crate) mod migration;
+
+#[cfg(feature = "pczt")]
+pub(crate) mod pczt;
 
 #[cfg(feature = "pczt-qr")]
 pub(crate) mod keystone;
@@ -34,6 +40,7 @@ pub(crate) struct Zip48 {
     pub(crate) command: zip48::Command,
 }
 
+#[cfg(feature = "pczt")]
 #[derive(Debug, Args)]
 pub(crate) struct Pczt {
     /// Path to a wallet directory
@@ -44,6 +51,7 @@ pub(crate) struct Pczt {
     pub(crate) command: pczt::Command,
 }
 
+#[cfg(feature = "migration")]
 #[derive(Debug, Args)]
 pub(crate) struct Migration {
     /// Path to a wallet directory

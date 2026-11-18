@@ -27,11 +27,15 @@ use context::{Context, ZUint256};
 use crate::ui::format_zec;
 
 pub(crate) mod address;
-pub(crate) mod block;
 pub(crate) mod foreign_address;
 pub(crate) mod keys;
 pub(crate) mod lookup;
 pub(crate) mod script;
+
+#[cfg(feature = "inspect-transaction")]
+pub(crate) mod block;
+
+#[cfg(feature = "inspect-transaction")]
 pub(crate) mod transaction;
 
 lazy_static! {
@@ -68,7 +72,10 @@ impl Command {
         } else if let Ok(request) = TransactionRequest::from_uri(&opts.data) {
             inspect_zip321(request);
         } else if let Ok(bytes) = hex::decode(&opts.data) {
+            #[cfg(feature = "inspect-transaction")]
             inspect_bytes(bytes, opts.context, opts.lookup).await;
+            #[cfg(not(feature = "inspect-transaction"))]
+            panic!("XXX the zcash_primitives v0.31.0 API changed sighash interfaces in a way I have ENOTIME to fix properly in this code, so I am “programming” like an axe murderer.");
         } else if let Ok(addr) = ZcashAddress::try_from_encoded(&opts.data) {
             address::inspect(addr);
         } else if let Some(addr) = foreign_address::detect(&opts.data) {
@@ -137,6 +144,7 @@ where
     res.ok().filter(|_| cursor.position() >= bytes.len() as u64)
 }
 
+#[cfg(feature = "inspect-transaction")]
 async fn inspect_bytes(bytes: Vec<u8>, context: Option<Context>, lookup: bool) {
     if let Some(block) = complete(&bytes, |r| block::Block::read(r)) {
         block::inspect(&block, context);
@@ -230,6 +238,7 @@ fn render_memo(memo_bytes: &MemoBytes) -> String {
     }
 }
 
+#[cfg(feature = "inspect-transaction")]
 async fn inspect_possible_hash(bytes: [u8; 32], context: Option<Context>, lookup: bool) {
     let mut maybe_mainnet_block_hash = bytes.iter().take(4).all(|c| c == &0);
 

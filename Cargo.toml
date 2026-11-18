@@ -107,9 +107,13 @@ tokio-util = { version = "0.7", optional = true }
 tui-logger = { version = "0.18", optional = true, features = ["tracing-support"] }
 
 [features]
-default = ["transparent-inputs"]
+default = ["transparent-inputs", "inspect"]
+inspect = []
+inspect-transaction = []
+migration = []
 qr = ["dep:qrcode"]
 regtest_support = ["zcash_protocol/local-consensus"]
+pczt = []
 pczt-qr = ["dep:image", "dep:minicbor", "dep:nokhwa", "dep:qrcode", "dep:rqrr", "dep:ur"]
 transparent-inputs = [
     "zcash_client_sqlite/transparent-inputs",
